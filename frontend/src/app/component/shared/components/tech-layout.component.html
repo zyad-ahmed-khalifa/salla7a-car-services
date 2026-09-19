@@ -1,0 +1,44 @@
+<div class="min-h-screen bg-bg">
+  <nav class="fixed top-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <app-logo (clicked)="goHome()" />
+        <span class="hidden sm:block text-xs font-medium bg-info/10 text-info border border-info/20 px-2 py-0.5 rounded-md">Technician</span>
+      </div>
+      <div class="hidden md:flex items-center gap-1">
+        @for (item of navItems; track item.path) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="bg-primary/10 text-primary"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer text-muted hover:text-text hover:bg-panel"
+          >
+            {{ item.label }}
+          </a>
+        }
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg">
+          <app-avatar [name]="session.user()?.name || 'Tech'" size="sm" />
+          <span class="text-sm text-muted">{{ firstName() }}</span>
+        </div>
+        <button type="button" class="hidden md:flex items-center gap-2 px-3 py-2 text-muted hover:text-danger rounded-lg hover:bg-panel transition text-sm cursor-pointer" (click)="session.logout()">Logout</button>
+        <button type="button" class="md:hidden p-2 text-muted hover:text-text hover:bg-panel rounded-lg transition cursor-pointer" (click)="mobileOpen.set(!mobileOpen())">
+          {{ mobileOpen() ? '✕' : '☰' }}
+        </button>
+      </div>
+    </div>
+    @if (mobileOpen()) {
+      <div class="md:hidden border-t border-border bg-surface px-4 py-3 flex flex-col gap-1">
+        @for (item of navItems; track item.path) {
+          <a [routerLink]="item.path" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted hover:text-text hover:bg-panel" (click)="mobileOpen.set(false)">{{ item.label }}</a>
+        }
+        <button type="button" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-danger hover:bg-panel text-left" (click)="session.logout()">Logout</button>
+      </div>
+    }
+  </nav>
+  <main class="pt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <router-outlet />
+    </div>
+  </main>
+</div>

@@ -1,0 +1,53 @@
+@if (!job()) {
+  <app-empty-state title="No active job" message="You don't have any active emergency assignment. Check available requests.">
+    <app-button (clicked)="goAvailable()">Browse Available Requests</app-button>
+  </app-empty-state>
+} @else {
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="font-display font-bold text-2xl text-text">Current Emergency</h1>
+      <p class="text-muted text-sm">{{ job()!.id }} · Active Job</p>
+    </div>
+    <app-badge type="emergency" [value]="status()" />
+  </div>
+  @if (alert()) { <div class="mb-5"><app-alert type="success" [message]="alert()" /></div> }
+  <div class="bg-surface border border-border rounded-xl p-5 mb-6">
+    <h2 class="font-semibold text-text mb-4">Job Progress</h2>
+    <div class="flex flex-wrap gap-2 mb-4">
+      @for (s of statusFlow; track s; let i = $index) {
+        <span class="text-xs px-2 py-1 rounded" [class]="i <= currentIdx() ? 'bg-primary text-bg' : 'bg-panel text-muted'">{{ s }}</span>
+      }
+    </div>
+    @if (action(); as a) {
+      <app-button [variant]="a.color" size="lg" [loading]="updating()" (clicked)="update()">{{ a.label }} →</app-button>
+    }
+  </div>
+  <div class="grid lg:grid-cols-2 gap-6">
+    <div class="bg-surface border border-border rounded-xl p-5">
+      <h2 class="font-semibold text-text mb-4">Customer & Vehicle</h2>
+      <div class="flex items-center gap-3 mb-4">
+        <app-avatar [name]="job()!.customerName" />
+        <div>
+          <div class="font-semibold text-text">{{ job()!.customerName }}</div>
+          <div class="text-sm text-muted">{{ job()!.customerPhone }}</div>
+        </div>
+      </div>
+      <div class="text-sm text-text">{{ job()!.vehicle.year }} {{ job()!.vehicle.make }} {{ job()!.vehicle.model }} · {{ job()!.vehicle.licensePlate }}</div>
+    </div>
+    <div class="bg-surface border border-border rounded-xl p-5">
+      <h2 class="font-semibold text-text mb-3">Problem Details</h2>
+      <div class="flex items-center gap-2 mb-2"><span class="font-semibold text-text">{{ job()!.problemType }}</span><app-badge type="priority" [value]="job()!.priority" /></div>
+      <p class="text-sm text-muted">{{ job()!.description }}</p>
+      <!-- <p class="text-sm text-text mt-4">{{ job()!.location }}</p> -->
+      <p class="text-sm text-text mt-4 mb-3">
+        {{ job()!.location.address }}
+      </p>
+      
+      <iframe class="w-full h-64 rounded-lg border-0" [src]="getMapUrl(
+          job()!.location.latitude,
+          job()!.location.longitude
+        )" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+}

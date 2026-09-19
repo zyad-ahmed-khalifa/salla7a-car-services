@@ -1,0 +1,55 @@
+<div class="min-h-screen bg-bg">
+  <nav class="fixed top-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-6">
+      <app-logo (clicked)="goHome()" />
+      <div class="hidden md:flex items-center gap-1">
+        @for (item of navItems; track item.path) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="bg-primary/10 text-primary"
+            [routerLinkActiveOptions]="{ exact: item.path === '/customer/emergencies' }"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer text-muted hover:text-text hover:bg-panel"
+          >
+            {{ item.label }}
+          </a>
+        }
+      </div>
+      <div class="flex items-center gap-2">
+        <a routerLink="/customer/cart" class="relative p-2 text-muted hover:text-text hover:bg-panel rounded-lg transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          @if (cart.count() > 0) {
+            <span class="absolute -top-0.5 -right-0.5 w-5 h-5 bg-primary text-bg text-xs font-bold rounded-full flex items-center justify-center">{{ cart.count() }}</span>
+          }
+        </a>
+        <a routerLink="/customer/profile" class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-panel transition cursor-pointer">
+          <app-avatar [name]="session.user()?.name || 'User'" size="sm" />
+          <span class="text-sm text-muted">{{ firstName() }}</span>
+        </a>
+        <button type="button" class="hidden md:flex items-center gap-2 px-3 py-2 text-muted hover:text-danger rounded-lg hover:bg-panel transition text-sm cursor-pointer" (click)="session.logout()">
+          Logout
+        </button>
+        <button type="button" class="md:hidden p-2 text-muted hover:text-text hover:bg-panel rounded-lg transition cursor-pointer" (click)="mobileOpen.set(!mobileOpen())">
+          {{ mobileOpen() ? '✕' : '☰' }}
+        </button>
+      </div>
+    </div>
+    @if (mobileOpen()) {
+      <div class="md:hidden border-t border-border bg-surface px-4 py-3 flex flex-col gap-1">
+        @for (item of navItems; track item.path) {
+          <a [routerLink]="item.path" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted hover:text-text hover:bg-panel" (click)="mobileOpen.set(false)">
+            {{ item.label }}
+          </a>
+        }
+        <a routerLink="/customer/profile" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted hover:text-text hover:bg-panel" (click)="mobileOpen.set(false)">Profile</a>
+        <button type="button" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-danger hover:bg-panel text-left" (click)="session.logout()">Logout</button>
+      </div>
+    }
+  </nav>
+  <main class="pt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <router-outlet />
+    </div>
+  </main>
+</div>

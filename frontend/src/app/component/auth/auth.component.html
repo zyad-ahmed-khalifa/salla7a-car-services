@@ -1,0 +1,58 @@
+<div class="min-h-screen bg-bg flex">
+  <div class="hidden lg:block lg:w-1/2 relative overflow-hidden">
+    <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=900&h=1200&fit=crop&auto=format" alt="Automotive" class="absolute inset-0 w-full h-full object-cover" />
+    <div class="absolute inset-0 bg-gradient-to-r from-bg via-bg/80 to-bg/20"></div>
+    <div class="absolute inset-0 flex flex-col justify-center px-12">
+      <div class="mb-8"><app-logo size="lg" /></div>
+      <h2 class="font-display font-black text-5xl text-text leading-tight mb-4">
+        Egypt's<br /><span class="text-primary">Automotive</span><br />Platform
+      </h2>
+      <p class="text-muted text-lg max-w-sm">Spare parts, emergency roadside assistance, and expert technicians — all in one place.</p>
+    </div>
+  </div>
+
+  <div class="flex-1 flex items-center justify-center p-6 lg:p-12">
+    <div class="w-full max-w-md">
+      <div class="flex items-center justify-center mb-8 lg:hidden">
+        <app-logo />
+      </div>
+
+      <div class="flex bg-panel rounded-xl p-1 mb-8">
+        <button type="button" class="flex-1 py-2.5 text-sm font-semibold rounded-lg transition cursor-pointer" [class]="tab() === 'login' ? 'bg-surface text-text shadow' : 'text-muted hover:text-text'" (click)="setTab('login')">Sign In</button>
+        <button type="button" class="flex-1 py-2.5 text-sm font-semibold rounded-lg transition cursor-pointer" [class]="tab() === 'signup' ? 'bg-surface text-text shadow' : 'text-muted hover:text-text'" (click)="setTab('signup')">Create Account</button>
+      </div>
+
+      <form class="flex flex-col gap-5" (submit)="$event.preventDefault(); submit()">
+        @if (error()) { <div class="bg-danger/10 border border-danger/20 text-danger rounded-lg px-3 py-2.5 text-sm">{{ error() }}</div> }
+        @if (tab() === 'signup') {
+          <app-input label="Full Name" placeholder="Ahmed Al-Rashidi" [value]="name" (valueChange)="name = $event" [required]="true" />
+        }
+        <app-input label="Email Address" type="email" placeholder="you@example.com" [value]="email" (valueChange)="email = $event" [required]="true" />
+        @if (tab() === 'signup') {
+          <app-input label="Phone Number" type="tel" placeholder="+966 50 000 0000" [value]="phone" (valueChange)="phone = $event" />
+        }
+        <app-input label="Password" type="password" placeholder="••••••••" [value]="password" (valueChange)="password = $event" [required]="true" />
+        @if (tab() === 'signup') {
+          <app-input label="Confirm Password" type="password" placeholder="••••••••" [value]="confirm" (valueChange)="confirm = $event" [required]="true" />
+        }
+        @if (tab() === 'login') {
+          <div class="text-right">
+            <button type="button" class="text-xs text-primary hover:underline cursor-pointer">Forgot password?</button>
+          </div>
+        }
+        <app-button type="submit" size="lg" extraClass="w-full mt-2" [loading]="loading()">
+          {{ tab() === 'login' ? 'Sign In' : 'Create Account' }}
+        </app-button>
+      </form>
+
+      @if (tab() === 'login') { <p class="text-xs text-subtle mt-4 text-center">Admin and technician accounts are created by the administrator. They cannot sign up here.</p> }
+      <p class="text-center text-sm text-muted mt-6">
+        {{ tab() === 'login' ? "Don't have an account? " : 'Already have an account? ' }}
+        <button type="button" class="text-primary hover:underline cursor-pointer font-medium" (click)="setTab(tab() === 'login' ? 'signup' : 'login')">
+          {{ tab() === 'login' ? 'Sign up' : 'Sign in' }}
+        </button>
+      </p>
+      <button type="button" class="block w-full text-center text-xs text-subtle hover:text-muted mt-4 cursor-pointer" (click)="router.navigateByUrl('/')">← Back to homepage</button>
+    </div>
+  </div>
+</div>

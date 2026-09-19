@@ -1,0 +1,54 @@
+<div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
+  <div class="flex items-center gap-4">
+    <app-avatar [name]="tech?.name || 'Technician'" size="lg" />
+    <div>
+      <h1 class="font-display font-bold text-2xl text-text">Hello, {{ tech?.name?.split(' ')[0] || 'Technician' }}!</h1>
+      <p class="text-muted text-sm">Emergency Technician</p>
+    </div>
+  </div>
+  <div class="sm:ml-auto flex items-center gap-2 bg-panel border border-border rounded-lg p-1">
+    @for (s of states; track s) {
+      <button type="button" class="px-3 py-1.5 rounded-md text-xs font-semibold" [class]="availClass(s)" (click)="availability.set(s)">{{ s }}</button>
+    }
+  </div>
+</div>
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <app-stat-card label="Completed Services" [value]="completed.length" color="success">★</app-stat-card>
+  <app-stat-card label="Rating" [value]="'—'" color="primary">★</app-stat-card>
+  <app-stat-card label="Active Jobs" [value]="active.length" color="info">⚡</app-stat-card>
+  <app-stat-card label="Pending Requests" [value]="pending().length" color="warning">⏱</app-stat-card>
+</div>
+<div class="grid lg:grid-cols-2 gap-6">
+  <div class="bg-surface border border-border rounded-xl p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display font-semibold text-lg text-text">Current Job</h2>
+      @if (active.length > 0) { <app-button size="sm" (clicked)="go('/technician/current')">View Details →</app-button> }
+    </div>
+    @if (active.length > 0) {
+      @for (e of active.slice(0, 1); track e.id) {
+        <div class="bg-panel border border-border rounded-xl p-4">
+          <div class="flex items-center gap-2 mb-2"><app-badge type="emergency" [value]="e.status" /><app-badge type="priority" [value]="e.priority" /></div>
+          <div class="font-semibold text-text mb-1">{{ e.problemType }}</div>
+          <div class="text-sm text-muted">{{ e.customerName }} · {{ e.vehicle.year }} {{ e.vehicle.make }} {{ e.vehicle.model }}</div>
+        </div>
+      }
+    } @else {
+      <p class="text-muted text-sm text-center py-8">No active job</p>
+    }
+  </div>
+  <div class="bg-surface border border-border rounded-xl p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display font-semibold text-lg text-text">Available Requests</h2>
+      <app-button size="sm" variant="secondary" (clicked)="go('/technician/emergencies')">View All</app-button>
+    </div>
+    @for (e of pending().slice(0, 3); track e.id) {
+      <div class="flex items-start gap-3 bg-panel border border-border rounded-lg p-3 mb-3">
+        <div class="flex-1">
+          <div class="text-sm font-medium text-text">{{ e.problemType }}</div>
+          <div class="text-xs text-muted">{{ e.customerName }}</div>
+        </div>
+        <app-badge type="priority" [value]="e.priority" />
+      </div>
+    }
+  </div>
+</div>

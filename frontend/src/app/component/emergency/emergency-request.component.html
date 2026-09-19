@@ -1,0 +1,67 @@
+@if (submitted()) {
+  <div class="max-w-md mx-auto py-10 text-center">
+    <div class="w-20 h-20 bg-danger/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse"></div>
+    <h1 class="font-display font-black text-3xl text-text mb-2">Request Submitted!</h1>
+    <p class="text-muted mb-2">We're finding the nearest available technician for you.</p>
+    <div class="bg-surface border border-border rounded-xl p-4 mb-6">
+      <div class="text-sm text-muted mb-1">Request ID</div>
+      <div class="font-display font-bold text-primary text-xl">{{ requestId() }}</div>
+    </div>
+    <app-button size="lg" extraClass="w-full" (clicked)="go('/customer/emergencies')">Track My Request</app-button>
+  </div>
+} @else {
+  <div class="max-w-2xl mx-auto">
+    @if (error()) { <div class="mb-5 bg-danger/10 border border-danger/20 text-danger rounded-lg p-3 text-sm">{{ error() }}</div> }
+    <h1 class="font-display font-bold text-2xl text-text mb-1">Request Emergency Help</h1>
+    <p class="text-muted text-sm mb-6">A certified technician will reach you within 15 minutes</p>
+    <form class="flex flex-col gap-6" (submit)="$event.preventDefault(); submit()">
+      <div class="bg-surface border border-border rounded-xl p-5">
+        <h2 class="font-semibold text-text mb-4">Your Vehicle</h2>
+        <p class="text-sm text-muted mb-3">Choose one of your registered vehicles, or type your vehicle below if you haven't registered it yet.</p>
+        <app-select [value]="vehicle" (valueChange)="onVehicleChange($event)" [options]="vehicleOptions" />
+        <div class="flex items-center gap-3 my-4">
+          <div class="h-px flex-1 bg-border"></div>
+          <span class="text-xs text-muted">OR</span>
+          <div class="h-px flex-1 bg-border"></div>
+        </div>
+        <label class="block text-sm font-medium text-text mb-2">Vehicle Type</label>
+        <input class="w-full bg-panel border border-border text-text rounded-lg px-3 py-2.5 text-sm" [value]="manualVehicleType" (input)="onManualVehicleChange($any($event.target).value)" placeholder="e.g. Toyota Corolla 2020" />
+      </div>
+      <div class="bg-surface border border-border rounded-xl p-5">
+        <h2 class="font-semibold text-text mb-4">What's the Problem?</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          @for (p of problemTypes; track p.type) {
+            <button type="button" class="p-3 border rounded-xl text-left transition cursor-pointer" [class]="problemType() === p.type ? 'border-danger bg-danger/10' : 'border-border hover:border-muted bg-panel'" (click)="problemType.set(p.type)">
+              <div class="text-2xl mb-1">{{ p.icon }}</div>
+              <div class="text-sm font-semibold text-text">{{ p.type }}</div>
+              <div class="text-xs text-muted">{{ p.desc }}</div>
+            </button>
+          }
+        </div>
+      </div>
+      <div class="bg-surface border border-border rounded-xl p-5">
+        <h2 class="font-semibold text-text mb-4">Priority Level</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          @for (p of priorities; track p.value) {
+            <button type="button" class="p-3 border-2 rounded-xl text-center cursor-pointer" [class]="priority() === p.value ? p.color : 'border-border text-muted'" (click)="priority.set(p.value)">
+              <div class="font-bold text-sm mb-0.5">{{ p.label }}</div>
+              <div class="text-xs opacity-70">{{ p.desc }}</div>
+            </button>
+          }
+        </div>
+      </div>
+      <div class="bg-surface border border-border rounded-xl p-5">
+        <h2 class="font-semibold text-text mb-4">Describe the Issue</h2>
+        <app-textarea [value]="description" (valueChange)="description = $event" placeholder="Describe what happened..." />
+      </div>
+      <div class="bg-surface border border-border rounded-xl p-5">
+        <h2 class="font-semibold text-text mb-4">Your Current Location</h2>
+        <div class="flex gap-3">
+          <input class="flex-1 bg-panel border border-border text-text rounded-lg px-3 py-2.5 text-sm" [value]="location" (input)="location = $any($event.target).value" placeholder="Enter your location or use GPS..." />
+          <app-button type="button" variant="secondary" [loading]="locating()" (clicked)="locate()">GPS</app-button>
+        </div>
+      </div>
+      <app-button type="submit" size="lg" extraClass="w-full" [loading]="submitting()" [disabled]="!problemType() || (!vehicle && !manualVehicleType.trim())">Submit Emergency Request</app-button>
+    </form>
+  </div>
+}

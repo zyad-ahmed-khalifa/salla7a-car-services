@@ -1,0 +1,78 @@
+<section class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold text-text">Admin Dashboard</h1>
+
+    <p class="mt-1 text-muted">
+      Manage users, technicians, spare parts, orders, and emergency requests.
+    </p>
+  </div>
+
+  <!-- Statistics -->
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    @for (stat of stats(); track stat.title) {
+      <div class="rounded-xl border border-subtle bg-surface p-5">
+        <p class="text-sm text-muted">
+          {{ stat.title }}
+        </p>
+
+        <p class="mt-2 text-2xl font-bold text-text">
+          {{ loading() ? '...' : stat.value }}
+        </p>
+      </div>
+    }
+  </div>
+
+  <!-- Admin Actions -->
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <button
+      type="button"
+      class="rounded-xl border border-subtle bg-surface p-5 text-left transition hover:border-primary"
+      (click)="go('/admin/users')"
+    >
+      <h2 class="font-semibold text-text">Manage Users</h2>
+
+      <p class="mt-2 text-sm text-muted">View and manage customer accounts.</p>
+    </button>
+
+    <button
+      type="button"
+      class="rounded-xl border border-subtle bg-surface p-5 text-left transition hover:border-primary"
+      (click)="go('/admin/technicians')"
+    >
+      <h2 class="font-semibold text-text">Manage Technicians</h2>
+
+      <p class="mt-2 text-sm text-muted">Manage technician profiles and availability.</p>
+    </button>
+
+    <button
+      type="button"
+      class="rounded-xl border border-subtle bg-surface p-5 text-left transition hover:border-primary"
+      (click)="go('/admin/products')"
+    >
+      <h2 class="font-semibold text-text">Manage Spare Parts</h2>
+
+      <p class="mt-2 text-sm text-muted">Add, edit, and manage spare parts.</p>
+    </button>
+
+    <button
+      type="button"
+      class="rounded-xl border border-subtle bg-surface p-5 text-left transition hover:border-primary"
+      (click)="go('/admin/orders')"
+    >
+      <h2 class="font-semibold text-text">Manage Orders</h2>
+
+      <p class="mt-2 text-sm text-muted">Review customer orders and statuses.</p>
+    </button>
+  </div>
+
+  <!-- Live Emergency Map -->
+  <div class="rounded-xl border border-subtle bg-surface p-5">
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-text">Live Emergency Map</h2>
+
+      <p class="mt-1 text-sm text-muted">View emergency requests on the map.</p>
+    </div>
+
+    <div id="emergency-map" class="h-[500px] w-full rounded-xl overflow-hidden"></div>
+  </div>
+</section>

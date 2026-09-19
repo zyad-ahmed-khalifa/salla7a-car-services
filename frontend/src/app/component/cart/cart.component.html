@@ -1,0 +1,58 @@
+@if (cart.items().length === 0) {
+  <app-empty-state title="Your cart is empty" message="Browse our parts catalog and add items to your cart.">
+    <app-button (clicked)="go('/customer/products')">Browse Spare Parts</app-button>
+  </app-empty-state>
+} @else {
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="font-display font-bold text-2xl text-text">Shopping Cart</h1>
+    <span class="text-muted text-sm">{{ cart.count() }} items</span>
+  </div>
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 flex flex-col gap-4">
+      @for (item of cart.items(); track item.product.id) {
+        <div class="bg-surface border border-border rounded-xl p-4 flex gap-4">
+          <div class="w-24 h-24 rounded-lg bg-bg overflow-hidden flex-shrink-0">
+            <img [src]="item.product.image" [alt]="item.product.name" class="w-full h-full object-cover" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs text-muted mb-0.5">{{ item.product.brand }} · {{ item.product.category }}</div>
+            <div class="font-semibold text-text text-sm mb-1 line-clamp-2 cursor-pointer hover:text-primary transition" (click)="openProduct(item.product.id)">{{ item.product.name }}</div>
+            <div class="flex items-center justify-between mt-3">
+              <div class="flex items-center gap-2">
+                <button type="button" class="w-8 h-8 bg-panel border border-border rounded-lg text-text" (click)="cart.update(item.product.id, item.quantity - 1)">−</button>
+                <span class="w-8 text-center text-sm font-semibold text-text">{{ item.quantity }}</span>
+                <button type="button" class="w-8 h-8 bg-panel border border-border rounded-lg text-text disabled:opacity-50" [disabled]="item.quantity >= item.product.stock" (click)="cart.update(item.product.id, item.quantity + 1)">+</button>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="font-display font-bold text-primary text-lg">EGP {{ (item.product.price * item.quantity).toFixed(2) }}</span>
+                <button type="button" class="text-muted hover:text-danger" (click)="cart.remove(item.product.id)">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      <app-button variant="ghost" extraClass="self-start text-sm" (clicked)="go('/customer/products')">← Continue Shopping</app-button>
+    </div>
+    <div>
+      <div class="bg-surface border border-border rounded-xl p-5 sticky top-24">
+        <h2 class="font-display font-semibold text-lg text-text mb-5">Order Summary</h2>
+        <div class="flex flex-col gap-3 mb-5">
+          <div class="flex justify-between text-sm"><span class="text-muted">Subtotal ({{ cart.count() }} items)</span><span class="text-text font-medium">EGP {{ cart.subtotal().toFixed(2) }}</span></div>
+          <div class="flex justify-between text-sm">
+            <span class="text-muted">Shipping</span>
+            <span [class]="cart.shipping() === 0 ? 'text-success font-medium' : 'text-text font-medium'">{{ cart.shipping() === 0 ? 'Free' : 'EGP ' + cart.shipping().toFixed(2) }}</span>
+          </div>
+          @if (cart.shipping() > 0) {
+            <p class="text-xs text-muted">Add EGP {{ (100 - cart.subtotal()).toFixed(2) }} more for free shipping</p>
+          }
+          <div class="border-t border-border pt-3 flex justify-between">
+            <span class="font-semibold text-text">Total</span>
+            <span class="font-display font-bold text-primary text-xl">EGP {{ cart.total().toFixed(2) }}</span>
+          </div>
+        </div>
+        <app-button size="lg" extraClass="w-full" (clicked)="go('/customer/checkout')">Proceed to Checkout →</app-button>
+        <div class="mt-4 text-center text-xs text-muted">Secure checkout</div>
+      </div>
+    </div>
+  </div>
+}

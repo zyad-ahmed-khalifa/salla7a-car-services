@@ -1,0 +1,58 @@
+<div class="mb-6">
+  <h1 class="font-display font-bold text-2xl">Orders Management</h1>
+  <p class="text-muted text-sm">{{ orders().length }} orders · EGP {{ revenue().toFixed(2) }} revenue</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+  @for (s of chips; track s) {
+    <button type="button" class="p-3 rounded-xl border text-left" [class]="statusFilter() === s ? 'border-primary bg-primary/10' : 'border-border bg-surface'" (click)="statusFilter.set(s)">
+      <div class="font-display font-bold text-2xl">{{ count(s) }}</div>
+      <div class="text-xs text-muted">{{ s }}</div>
+    </button>
+  }
+</div>
+<div class="flex flex-col sm:flex-row gap-3 mb-5">
+  <div class="flex-1"><app-search-bar [value]="search()" (valueChange)="search.set($event)" /></div>
+  <select class="bg-panel border border-border text-text text-sm rounded-lg px-3 py-2.5" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)">
+    @for (s of ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']; track s) { <option [value]="s">{{ s }}</option> }
+  </select>
+</div>
+<div class="bg-surface border border-border rounded-xl overflow-x-auto">
+  <table class="w-full">
+    <thead><tr class="border-b border-border bg-panel">
+      <th class="text-left px-4 py-3 text-xs text-muted uppercase">Order</th>
+      <th class="text-left px-4 py-3 text-xs text-muted uppercase hidden md:table-cell">Customer</th>
+      <th class="text-right px-4 py-3 text-xs text-muted uppercase">Total</th>
+      <th class="text-left px-4 py-3 text-xs text-muted uppercase">Status</th>
+      <th class="text-right px-4 py-3 text-xs text-muted uppercase">Actions</th>
+    </tr></thead>
+    <tbody class="divide-y divide-border">
+      @for (o of filtered(); track o.id) {
+        <tr>
+          <td class="px-4 py-3 font-mono text-sm">{{ o.id }}</td>
+          <td class="px-4 py-3 hidden md:table-cell text-sm">{{ o.customerName }}</td>
+          <td class="px-4 py-3 text-right font-bold text-primary">EGP {{ o.total.toFixed(2) }}</td>
+          <td class="px-4 py-3">
+            <select class="bg-panel border border-border text-text text-xs rounded-lg px-2 py-1" [value]="getStatus(o)" (change)="updateStatus(o.id, $any($event.target).value)">
+              @for (s of statusOptions; track s.value) { <option [value]="s.value">{{ s.label }}</option> }
+            </select>
+          </td>
+          <td class="px-4 py-3 text-right"><button type="button" class="text-xs text-primary" (click)="selected.set(o)">View</button></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+<app-modal [open]="!!selected()" [title]="'Order ' + (selected()?.id || '')" size="xl" (closed)="selected.set(null)">
+  @if (selected(); as o) {
+    <p class="text-sm text-muted mb-4">{{ o.date }} · {{ o.customerName }} · {{ o.vehicle }}</p>
+    @for (item of o.items; track $index) {
+      <div class="flex gap-3 items-center bg-panel rounded-lg p-3 mb-2">
+        <img [src]="item.product.image" class="w-12 h-12 rounded-lg object-cover" />
+        <div class="flex-1"><div class="text-sm font-medium">{{ item.product.name }}</div><div class="text-xs text-muted">Qty: {{ item.quantity }}</div></div>
+        <div class="font-bold text-primary">EGP {{ item.price.toFixed(2) }}</div>
+      </div>
+    }
+    <div class="flex justify-between font-bold pt-3"><span>Total</span><span class="text-primary">EGP {{ o.total.toFixed(2) }}</span></div>
+    <div class="flex justify-end mt-4"><app-button variant="secondary" (clicked)="selected.set(null)">Close</app-button></div>
+  }
+</app-modal>

@@ -1,0 +1,47 @@
+@if (error()) { <div class="mb-5"><app-alert type="error" [message]="error()" /></div> }
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="font-display font-bold text-2xl text-text">My Vehicles</h1>
+    <p class="text-muted text-sm">{{ myVehicles().length }} registered vehicle{{ myVehicles().length !== 1 ? 's' : '' }}</p>
+  </div>
+  <app-button (clicked)="openAdd()">Add Vehicle</app-button>
+</div>
+@if (saved()) { <div class="mb-5"><app-alert type="success" message="Vehicle saved successfully." /></div> }
+@if (myVehicles().length === 0) {
+  <app-empty-state title="No vehicles added" message="Add your vehicles to get compatible parts and faster emergency assistance.">
+    <app-button (clicked)="openAdd()">Add Your First Vehicle</app-button>
+  </app-empty-state>
+} @else {
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    @for (v of myVehicles(); track v.id) {
+      <div class="bg-surface border border-border rounded-xl p-5">
+        <div class="font-display font-bold text-text">{{ v.make }} {{ v.model }}</div>
+        <div class="text-sm text-muted mb-4">{{ v.year }}</div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div><p class="text-xs text-muted mb-0.5">License Plate</p><p class="text-sm font-medium text-text font-mono">{{ v.licensePlate }}</p></div>
+          <div><p class="text-xs text-muted mb-0.5">Color</p><p class="text-sm font-medium text-text">{{ v.color }}</p></div>
+        </div>
+        <div class="flex gap-2 border-t border-border pt-4">
+          <app-button variant="secondary" size="sm" extraClass="flex-1" (clicked)="openEdit(v)">Edit</app-button>
+          <app-button variant="danger" size="sm" (clicked)="confirmDelete.set(v.id)">Delete</app-button>
+        </div>
+      </div>
+    }
+    <button type="button" class="border-2 border-dashed border-border rounded-xl p-5 min-h-44 text-muted hover:border-primary hover:text-primary" (click)="openAdd()">+ Add New Vehicle</button>
+  </div>
+}
+<app-modal [open]="showModal()" [title]="editing() ? 'Edit Vehicle' : 'Add New Vehicle'" (closed)="showModal.set(false)">
+  <div class="grid grid-cols-2 gap-4">
+    <app-select label="Make" [value]="make" (valueChange)="make = $event" [options]="makes" />
+    <app-input label="Model" [value]="model" (valueChange)="model = $event" />
+    <app-input label="Year" type="number" [value]="year" (valueChange)="year = $event" />
+    <app-select label="Color" [value]="color" (valueChange)="color = $event" [options]="colors" />
+    <div class="col-span-2"><app-input label="License Plate" [value]="licensePlate" (valueChange)="licensePlate = $event" /></div>
+    <div class="col-span-2"><app-input label="VIN (optional)" [value]="vin" (valueChange)="vin = $event" /></div>
+  </div>
+  <div class="flex gap-3 justify-end mt-4">
+    <app-button variant="secondary" (clicked)="showModal.set(false)">Cancel</app-button>
+    <app-button [disabled]="!make || !model || !licensePlate" (clicked)="save()">{{ editing() ? 'Save Changes' : 'Add Vehicle' }}</app-button>
+  </div>
+</app-modal>
+<app-confirm [open]="!!confirmDelete()" title="Delete Vehicle" message="Are you sure you want to remove this vehicle?" confirmLabel="Delete" [danger]="true" (closed)="confirmDelete.set(null)" (confirmed)="confirmDelete() && delete(confirmDelete()!)" />

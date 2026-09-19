@@ -1,0 +1,51 @@
+<div class="min-h-screen bg-bg flex">
+  @if (sidebarOpen()) {
+    <div class="fixed inset-0 bg-black/60 z-30 lg:hidden" (click)="sidebarOpen.set(false)"></div>
+  }
+  <aside
+    class="fixed top-0 left-0 h-full w-64 bg-surface border-r border-border z-40 transition-transform duration-200 lg:translate-x-0"
+    [class.translate-x-0]="sidebarOpen()"
+    [class.-translate-x-full]="!sidebarOpen()"
+  >
+    <div class="flex flex-col h-full">
+      <div class="p-5 border-b border-border">
+        <app-logo (clicked)="goHome()" />
+        <span class="mt-2 inline-block text-xs font-medium bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-md">Admin Panel</span>
+      </div>
+      <nav class="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto">
+        @for (item of navItems; track item.path) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="bg-primary/10 text-primary"
+            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition cursor-pointer text-left text-muted hover:text-text hover:bg-panel"
+            (click)="sidebarOpen.set(false)"
+          >
+            {{ item.label }}
+          </a>
+        }
+      </nav>
+      <div class="p-3 border-t border-border">
+        <div class="flex items-center gap-3 px-3 py-2 mb-1">
+          <app-avatar [name]="session.user()?.name || 'Admin'" size="sm" />
+          <div class="min-w-0">
+            <div class="text-sm font-medium text-text truncate">{{ session.user()?.name }}</div>
+            <div class="text-xs text-muted truncate">Administrator</div>
+          </div>
+        </div>
+        <button type="button" class="w-full flex items-center gap-3 px-3 py-2 text-muted hover:text-danger rounded-lg hover:bg-panel transition text-sm cursor-pointer" (click)="session.logout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </aside>
+  <div class="lg:ml-64 flex-1 flex flex-col min-h-screen">
+    <header class="lg:hidden sticky top-0 z-20 bg-surface/95 backdrop-blur-md border-b border-border h-14 flex items-center justify-between px-4">
+      <button type="button" class="p-2 text-muted hover:text-text cursor-pointer" (click)="sidebarOpen.set(true)">☰</button>
+      <app-logo (clicked)="goHome()" />
+      <div class="w-9"></div>
+    </header>
+    <main class="flex-1 p-6">
+      <router-outlet />
+    </main>
+  </div>
+</div>

@@ -1,0 +1,79 @@
+@if (selected(); as order) {
+  <button type="button" class="text-muted hover:text-text text-sm mb-6 cursor-pointer" (click)="selected.set(null)">← Back to Orders</button>
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 flex flex-col gap-4">
+      <div class="bg-surface border border-border rounded-xl p-5">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="font-display font-bold text-xl text-text">{{ order.id }}</h2>
+            <p class="text-muted text-sm">{{ order.date }}</p>
+          </div>
+          <app-badge type="order" [value]="order.status" />
+        </div>
+        @if (order.status !== 'Cancelled') {
+          <div class="flex items-center gap-0">
+            @for (s of statusFlow; track s; let i = $index) {
+              <div class="flex items-center flex-1 last:flex-none">
+                <div class="flex flex-col items-center gap-1">
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" [class]="i <= statusIdx(order) ? 'bg-primary text-bg' : 'bg-panel border border-border text-muted'">{{ i < statusIdx(order) ? '✓' : i + 1 }}</div>
+                  <span class="text-xs text-muted text-center">{{ s }}</span>
+                </div>
+                @if (i < statusFlow.length - 1) {
+                  <div class="flex-1 h-0.5 mb-4 mx-1" [class]="i < statusIdx(order) ? 'bg-primary' : 'bg-border'"></div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <div class="bg-surface border border-border rounded-xl p-5">
+        <h3 class="font-semibold text-text mb-4">Order Items</h3>
+        @for (item of order.items; track $index) {
+          <div class="flex gap-3 items-center pb-3 border-b border-border last:border-0">
+            <div class="w-14 h-14 rounded-lg bg-bg overflow-hidden"><img [src]="item.product.image" class="w-full h-full object-cover" /></div>
+            <div class="flex-1"><div class="text-sm font-medium text-text">{{ item.product.name }}</div><div class="text-xs text-muted">Qty: {{ item.quantity }}</div></div>
+            <div class="font-semibold text-text">EGP {{ item.price.toFixed(2) }}</div>
+          </div>
+        }
+      </div>
+    </div>
+    <div class="bg-surface border border-border rounded-xl p-5">
+      <h3 class="font-semibold text-text mb-4">Payment Summary</h3>
+      <div class="flex justify-between text-sm mb-2"><span class="text-muted">Subtotal</span><span>EGP {{ order.subtotal.toFixed(2) }}</span></div>
+      <div class="flex justify-between text-sm mb-2"><span class="text-muted">Shipping</span><span>{{ order.shipping === 0 ? 'Free' : 'EGP ' + order.shipping.toFixed(2) }}</span></div>
+      <div class="border-t border-border pt-2 flex justify-between font-semibold"><span>Total</span><span class="text-primary font-display font-bold text-xl">EGP {{ order.total.toFixed(2) }}</span></div>
+    </div>
+  </div>
+} @else {
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="font-display font-bold text-2xl text-text">My Orders</h1>
+      <p class="text-muted text-sm">{{ orders().length }} total orders</p>
+    </div>
+  </div>
+  <div class="flex flex-col sm:flex-row gap-3 mb-6">
+    <div class="flex-1"><app-search-bar [value]="search()" (valueChange)="search.set($event)" placeholder="Search by order ID or vehicle..." /></div>
+    <select class="bg-panel border border-border text-text text-sm rounded-lg px-3 py-2.5" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)">
+      @for (s of statuses; track s) { <option [value]="s">{{ s }}</option> }
+    </select>
+  </div>
+  @if (filtered().length === 0) {
+    <app-empty-state title="No orders found" message="Your orders will appear here after you make a purchase." [hasIcon]="false">
+      <app-button (clicked)="statusFilter.set('All')">Clear Filters</app-button>
+    </app-empty-state>
+  } @else {
+    <div class="flex flex-col gap-3">
+      @for (order of filtered(); track order.id) {
+        <div class="bg-surface border border-border rounded-xl p-4 sm:p-5 hover:border-primary/30 transition cursor-pointer" (click)="selected.set(order)">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-1"><span class="font-display font-bold text-text">{{ order.id }}</span><app-badge type="order" [value]="order.status" /></div>
+              <p class="text-sm text-muted">{{ order.date }} · {{ order.vehicle }}</p>
+            </div>
+            <div class="font-display font-bold text-primary text-xl">EGP {{ order.total.toFixed(2) }}</div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+}

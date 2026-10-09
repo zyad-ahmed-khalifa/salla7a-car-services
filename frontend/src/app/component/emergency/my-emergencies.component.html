@@ -1,0 +1,79 @@
+@if (selected(); as e) {
+  <button type="button" class="text-muted hover:text-text text-sm mb-6" (click)="selected.set(null)">← Back to Emergencies</button>
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 flex flex-col gap-5">
+      <div class="bg-surface border border-border rounded-xl p-5">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="font-display font-bold text-xl text-text">{{ e.id }}</h2>
+            <p class="text-muted text-sm">{{ e.problemType }} · {{ e.vehicle.year }} {{ e.vehicle.make }} {{ e.vehicle.model }}</p>
+          </div>
+          <div class="flex gap-2"><app-badge type="emergency" [value]="e.status" /><app-badge type="priority" [value]="e.priority" /></div>
+        </div>
+        <p class="text-sm text-text">{{ e.description }}</p>
+        <p class="text-sm text-muted mt-3">{{ e.location.address }}</p>
+      </div>
+      <!-- <div class="bg-surface border border-border rounded-xl p-5">
+        <h3 class="font-semibold text-text mb-4">Status Timeline</h3>
+        @for (h of e.statusHistory; track $index) {
+          <div class="flex gap-3 items-start mb-3">
+            <div class="w-2.5 h-2.5 rounded-full bg-primary mt-1"></div>
+            <div>
+              <app-badge type="emergency" [value]="h.status" />
+              <p class="text-xs text-muted mt-1">{{ formatDate(h.time) }}</p>
+              @if (h.note) { <p class="text-xs text-text mt-0.5">{{ h.note }}</p> }
+            </div>
+          </div>
+        }
+      </div> -->
+    </div>
+    <div>
+      @if (e.technicianName) {
+        <div class="bg-surface border border-border rounded-xl p-5">
+          <h3 class="font-semibold text-text mb-4">Assigned Technician</h3>
+          <div class="flex items-center gap-3">
+            <app-avatar [name]="e.technicianName" size="lg" />
+            <div>
+              <div class="font-semibold text-text">{{ e.technicianName }}</div>
+              <div class="text-sm text-muted">{{ e.technicianPhone }}</div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="bg-surface border border-border rounded-xl p-5 text-center">
+          <p class="text-sm font-medium text-text mb-1">Finding Technician</p>
+          <p class="text-xs text-muted">We're matching you with the nearest available technician</p>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="font-display font-bold text-2xl text-text">My Emergencies</h1>
+      <p class="text-muted text-sm">{{ active().length }} active · {{ history().length }} completed</p>
+    </div>
+    <app-button (clicked)="goRequest()">+ New Request</app-button>
+  </div>
+  <div class="mb-5"><app-tabs [tabs]="['Active', 'History']" [active]="tab()" (activeChange)="tab.set($event)" /></div>
+  @if (list().length === 0) {
+    <app-empty-state [title]="tab() === 'Active' ? 'No active emergencies' : 'No emergency history'" [message]="tab() === 'Active' ? 'You do not have any active emergency requests.' : 'Your past emergency requests will appear here.'" [hasIcon]="false">
+      @if (tab() === 'Active') { <app-button (clicked)="goRequest()">Request Emergency Help</app-button> }
+    </app-empty-state>
+  } @else {
+    <div class="flex flex-col gap-4">
+      @for (e of list(); track e.id) {
+        <div class="bg-surface border border-border rounded-xl p-5 hover:border-primary/30 cursor-pointer" (click)="selected.set(e)">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="font-display font-bold text-text">{{ e.id }}</span>
+            <app-badge type="emergency" [value]="e.status" />
+            <app-badge type="priority" [value]="e.priority" />
+          </div>
+          <p class="text-sm text-muted">{{ formatDate(e.createdAt) }}</p>
+          <div class="text-sm font-medium text-text mt-2">{{ e.problemType }} · {{ e.vehicle.year }} {{ e.vehicle.make }} {{ e.vehicle.model }}</div>
+          <p class="text-sm text-muted line-clamp-2 mt-1">{{ e.description }}</p>
+        </div>
+      }
+    </div>
+  }
+}
